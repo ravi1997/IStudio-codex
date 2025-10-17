@@ -1,6 +1,7 @@
 set(ISTUDIO_CORE_SOURCES
   front/token.cpp
   front/lexer.cpp
+  front/parser.cpp
   front/ast.cpp
   sem/context.cpp
   ir/module.cpp

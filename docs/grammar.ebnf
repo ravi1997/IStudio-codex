@@ -1,0 +1,55 @@
+(* IStudio core grammar sketch for expressions and statements *)
+
+Module        ::= { Declaration } EOF ;
+Declaration   ::= FunctionDecl | Statement ;
+
+FunctionDecl  ::= "fn" Identifier "(" [ ParameterList ] ")" Block ;
+ParameterList ::= Parameter { "," Parameter } ;
+Parameter     ::= Identifier [ ":" TypeExpr ] ;
+
+Statement     ::= LetStatement
+                | ReturnStatement
+                | ExpressionStatement
+                | Block ;
+
+LetStatement      ::= "let" [ "mut" ] Pattern [ ":" TypeExpr ] "=" Expression ";" ;
+ReturnStatement   ::= "return" [ Expression ] ";" ;
+ExpressionStatement ::= Expression ";" ;
+
+Block          ::= "{" { Statement } "}" ;
+Pattern        ::= Identifier ;
+TypeExpr       ::= Identifier [ "<" TypeExpr { "," TypeExpr } ">" ] ;
+
+Expression     ::= Assignment ;
+Assignment     ::= LogicOr [ AssignmentOp Assignment ] ;
+AssignmentOp   ::= "=" | "+=" | "-=" | "*=" | "/=" ;
+
+LogicOr        ::= LogicAnd { "||" LogicAnd } ;
+LogicAnd       ::= Equality { "&&" Equality } ;
+Equality       ::= Comparison { ( "==" | "!=" ) Comparison } ;
+Comparison     ::= Term { ( "<" | ">" | "<=" | ">=" ) Term } ;
+Term           ::= Factor { ( "+" | "-" ) Factor } ;
+Factor         ::= Unary { ( "*" | "/" | "%" ) Unary } ;
+Unary          ::= ( "!" | "-" | "+" | "await" ) Unary | Call ;
+Call           ::= Primary { CallSuffix } ;
+CallSuffix     ::= "(" [ ArgumentList ] ")" | "." Identifier ;
+ArgumentList   ::= Expression { "," Expression } ;
+
+Primary        ::= Literal
+                | Identifier
+                | "(" Expression ")"
+                | "[" [ Expression { "," Expression } ] "]" ;
+
+Literal        ::= NumberLiteral
+                | StringLiteral
+                | "true"
+                | "false"
+                | "nil" ;
+
+NumberLiteral  ::= Digit { Digit } [ "." Digit { Digit } ] ;
+StringLiteral  ::= "\"" { Character } "\"" ;
+Identifier     ::= Letter { Letter | Digit | "_" } ;
+
+Letter         ::= "A" | ... | "Z" | "a" | ... | "z" | "_" ;
+Digit          ::= "0" | ... | "9" ;
+

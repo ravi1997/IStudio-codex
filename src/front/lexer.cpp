@@ -30,6 +30,18 @@ bool is_keyword(std::string_view word) {
   return false;
 }
 
+bool is_compound_symbol(std::string_view symbol) {
+  constexpr std::array<std::string_view, 20> compound{
+      "==", "!=", "<=", ">=", "&&", "||", "::", "->", "=>", "+=", "-=", "*=", "/=", "%=", "&=", "|=", "^=", "<<",
+      ">>", ">>="};
+  for (auto sym : compound) {
+    if (sym == symbol) {
+      return true;
+    }
+  }
+  return false;
+}
+
 }  // namespace
 
 Lexer::Lexer(std::string_view source, LexerConfig config)
@@ -137,12 +149,25 @@ Token Lexer::read_string() {
 
 Token Lexer::read_symbol() {
   const auto start = position_;
+  std::string lexeme;
+  lexeme.push_back(source_[position_]);
   ++position_;
-  const auto end = position_;
+
+  while (position_ < source_.size()) {
+    std::string candidate = lexeme;
+    candidate.push_back(source_[position_]);
+    if (is_compound_symbol(candidate)) {
+      lexeme = std::move(candidate);
+      ++position_;
+      continue;
+    }
+    break;
+  }
+
   Token token{};
   token.leading_trivia = std::exchange(pending_leading_, {});
-  token.lexeme = std::string(source_.substr(start, end - start));
-  token.span = {start, end};
+  token.lexeme = std::move(lexeme);
+  token.span = {start, position_};
   token.kind = TokenKind::Symbol;
   return token;
 }

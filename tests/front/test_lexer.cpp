@@ -79,15 +79,8 @@ void test_captures_trivia_when_enabled() {
 
 }  // namespace
 
-int main() {
-  try {
-    test_tokenizes_keywords_identifiers_and_symbols();
-    test_captures_trivia_when_enabled();
-  } catch (const std::exception& ex) {
-    std::cerr << "[lexer] " << ex.what() << '\n';
-    return EXIT_FAILURE;
-  }
-
+void run_lexer_tests() {
+  test_tokenizes_keywords_identifiers_and_symbols();
+  test_captures_trivia_when_enabled();
   std::cout << "All lexer tests passed\n";
-  return EXIT_SUCCESS;
 }

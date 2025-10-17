@@ -1,5 +1,7 @@
 set(ISTUDIO_TEST_SOURCES
   front/test_lexer.cpp
+  front/test_parser.cpp
+  test_main.cpp
 )
 
 add_executable(istudio_tests ${ISTUDIO_TEST_SOURCES})

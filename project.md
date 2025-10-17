@@ -27,6 +27,16 @@
 * Monorepo with CMake + Conan presets; `src/`, `runtime/`, `std/`, `examples/`.
 * CLI `istudio` scaffolding; logging, error diagnostics, config loader.
 
+**Progress (2024-10-17).**
+
+* ✅ Repository skeleton established with CMake-based build (`CMakeLists.txt`, `src/`, `tests/`, `cmake/`, runtime/std/examples placeholders).
+* ✅ CLI entry point `istudio` implemented with `--version` handling and shared warning policy.
+* ✅ Minimal lexer, token/trivia model, AST context scaffolding, semantic, IR, opt, backend interfaces stubbed.
+* ✅ Self-contained lexer smoke tests wired via CTest; CI workflow configured (GitHub Actions) to build and run tests on Linux.
+* ✅ Authored `docs/grammar.ebnf` capturing core expression/statement grammar for the forthcoming Pratt parser.
+* ✅ Implemented initial Pratt-style expression parser with assignment/binary/unary/call support plus parser-focused tests.
+* 🔜 Stand up IR printing & constant folding scaffolds; extend parser to cover statements.
+
 **M1 – Language Spec & Grammar (Weeks 1–2)**
 
 * Language reference (EBNF) + typing rules + attribute/annotation system.
@@ -482,9 +492,9 @@ OUTPUT FORMAT
 
 ## 22) Next Concrete Steps (Actionable)
 
-* Initialize repo with the skeleton from the **MASTER AI PROMPT**.
-* Implement tokens and a minimal lexer; add golden tests.
-* Write EBNF for core expressions/statements; parser for expressions first.
+* ✅ Initialize repo with the skeleton from the **MASTER AI PROMPT** (completed 2024-10-17).
+* ✅ Implement tokens and a minimal lexer; add golden tests (completed 2024-10-17).
+* ✅ Write EBNF for core expressions/statements; parser for expressions first (completed 2024-10-17).
 * Stand up IR structs and printer; implement const folding.
 * Build the C++ backend emitter for functions + structs + generics (templates).
 * Add 3 example programs and their emitted C++/Java/Python to lock mapping.
