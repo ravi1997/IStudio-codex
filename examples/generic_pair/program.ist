@@ -1,0 +1,14 @@
+module GenericPair;
+
+pub struct Pair<T> {
+  first: T;
+  second: T;
+}
+
+pub fn make_pair<T>(first: T, second: T) -> Pair<T> {
+  return Pair { first: first, second: second };
+}
+
+pub fn swap<T>(input: Pair<T>) -> Pair<T> {
+  return Pair { first: input.second, second: input.first };
+}

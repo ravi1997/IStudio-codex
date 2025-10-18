@@ -4,8 +4,9 @@
 - Modular compiler toolchain skeleton for the IStudio language
 - Components in place for lexer, AST context, semantic scaffolding, IR, optimization passes, backend interface, diagnostics, and plugin registry
 - Command-line entry point with `--version` support
-- Pratt-style expression parser with assignment/binary/unary/call coverage
-- Self-contained lexer and parser smoke tests runnable via CTest
+- Pratt-style parser covering expressions plus let/return/block statements
+- Initial IST-IR printer and constant folding pass with dedicated tests
+- Self-contained lexer, parser, and IR smoke tests runnable via CTest
 
 ## Getting Started
 - Configure: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug`
@@ -17,10 +18,11 @@
 - `tests/`: unit and golden tests (initial lexer coverage)
 - `cmake/`: dependency helpers
 - `.github/workflows/`: CI pipelines
-- `docs/`, `runtime/`, `std/`, `examples/`, `tools/`: placeholders for future work
+- `docs/`, `runtime/`, `std/`, `tools/`: placeholders for future work
+- `examples/`: curated sample programs with synchronized backend outputs (C++/Java/Python)
 
 ## Next Steps
-1. Extend the parser to cover statements/declarations and expose AST dumps for tooling
-2. Expand semantic analysis with type information and diagnostics
-3. Define the IST-IR format and add serialization/printing with const-folding hooks
+1. Expose AST dump tooling and drive semantic/type analysis scaffolding
+2. Flesh out IST-IR lowering plus verifier ahead of richer optimisations
+3. Expand diagnostics and type system groundwork for statements/blocks
 4. Implement the first code generation backend (C++) and extend tests accordingly

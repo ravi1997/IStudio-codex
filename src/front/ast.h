@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "support/span.h"
@@ -24,6 +25,10 @@ enum class AstKind {
   CallExpr,
   ArgumentList,
   GroupExpr,
+  BlockStmt,
+  LetStmt,
+  ReturnStmt,
+  ExpressionStmt,
 };
 
 struct AstNode {
@@ -46,5 +51,7 @@ class AstContext {
  private:
   std::vector<AstNode> nodes_{};
 };
+
+[[nodiscard]] std::string_view to_string(AstKind kind) noexcept;
 
 }  // namespace istudio::front

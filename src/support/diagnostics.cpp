@@ -12,6 +12,14 @@ std::string_view to_string(DiagCode code) {
       return "GenericNote";
     case DiagCode::LexUnknownToken:
       return "LexUnknownToken";
+    case DiagCode::SemDuplicateSymbol:
+      return "SemDuplicateSymbol";
+    case DiagCode::SemUnknownIdentifier:
+      return "SemUnknownIdentifier";
+    case DiagCode::SemTypeMismatch:
+      return "SemTypeMismatch";
+    case DiagCode::SemArgumentCountMismatch:
+      return "SemArgumentCountMismatch";
   }
   return "Unknown";
 }

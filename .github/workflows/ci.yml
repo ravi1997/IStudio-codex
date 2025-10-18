@@ -8,17 +8,59 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux-gcc
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+          - name: linux-clang
+            os: ubuntu-latest
+            cc: clang
+            cxx: clang++
+          - name: macos-clang
+            os: macos-latest
+            cc: clang
+            cxx: clang++
+          - name: windows-msvc
+            os: windows-latest
+            cc: ""
+            cxx: ""
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure
+      - name: Configure toolchain
+        if: ${{ matrix.cc != '' }}
+        run: |
+          echo "CC=${{ matrix.cc }}" >> "$GITHUB_ENV"
+          echo "CXX=${{ matrix.cxx }}" >> "$GITHUB_ENV"
+
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Configure (Unix)
+        if: runner.os != 'Windows'
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
         run: cmake --build build --config Release --parallel
 
-      - name: Test
+      - name: Build (Unix)
+        if: runner.os != 'Windows'
+        run: cmake --build build --parallel
+
+      - name: Test (Windows)
+        if: runner.os == 'Windows'
+        run: ctest --test-dir build --output-on-failure -C Release
+
+      - name: Test (Unix)
+        if: runner.os != 'Windows'
         run: ctest --test-dir build --output-on-failure

@@ -1,0 +1,10 @@
+module MathBasics;
+
+fn add(a: i32, b: i32) -> i32 {
+  return a + b;
+}
+
+fn triple(value: i32) -> i32 {
+  let doubled = add(value, value);
+  return doubled + value;
+}

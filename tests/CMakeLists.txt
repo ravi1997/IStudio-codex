@@ -1,6 +1,12 @@
 set(ISTUDIO_TEST_SOURCES
+  backends/test_cpp_backend.cpp
   front/test_lexer.cpp
   front/test_parser.cpp
+  front/test_ast_dump.cpp
+  sem/test_semantic.cpp
+  ir/test_ir.cpp
+  ir/test_lowering.cpp
+  lsp/test_lsp.cpp
   test_main.cpp
 )
 

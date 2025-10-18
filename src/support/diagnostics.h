@@ -11,6 +11,10 @@ namespace istudio::support {
 enum class DiagCode {
   GenericNote = 0,
   LexUnknownToken = 1000,
+  SemDuplicateSymbol = 2000,
+  SemUnknownIdentifier = 2001,
+  SemTypeMismatch = 2002,
+  SemArgumentCountMismatch = 2003,
 };
 
 struct Diagnostic {

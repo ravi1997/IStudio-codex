@@ -27,40 +27,43 @@
 * Monorepo with CMake + Conan presets; `src/`, `runtime/`, `std/`, `examples/`.
 * CLI `istudio` scaffolding; logging, error diagnostics, config loader.
 
-**Progress (2024-10-17).**
+**Progress (2025-10-17).**
 
 * ✅ Repository skeleton established with CMake-based build (`CMakeLists.txt`, `src/`, `tests/`, `cmake/`, runtime/std/examples placeholders).
 * ✅ CLI entry point `istudio` implemented with `--version` handling and shared warning policy.
 * ✅ Minimal lexer, token/trivia model, AST context scaffolding, semantic, IR, opt, backend interfaces stubbed.
 * ✅ Self-contained lexer smoke tests wired via CTest; CI workflow configured (GitHub Actions) to build and run tests on Linux.
 * ✅ Authored `docs/grammar.ebnf` capturing core expression/statement grammar for the forthcoming Pratt parser.
-* ✅ Implemented initial Pratt-style expression parser with assignment/binary/unary/call support plus parser-focused tests.
-* 🔜 Stand up IR printing & constant folding scaffolds; extend parser to cover statements.
+* ✅ Implemented Pratt-style expression parser with assignment/binary/unary/call coverage plus module-level statement handling (let, return, blocks) and expanded parser tests (expression, statement, block coverage).
+* ✅ Stood up IST-IR text printer and a constant-folding optimization scaffold with targeted unit tests covering folding and pretty-print emission.
+* ✅ Implemented the initial C++ backend emitter for structs, generics, and functions with translation tests (`tests/backends/test_cpp_backend.cpp`).
+* 🔜 Expose AST dump tooling and seed semantic analysis/type-checking passes (symbol tables, type contexts).
 
 **M1 – Language Spec & Grammar (Weeks 1–2)**
 
-* Language reference (EBNF) + typing rules + attribute/annotation system.
-* Design docs for compile‑time computation (CTC) & macros/metaclasses.
+* ✅ Language reference (EBNF) + typing rules + attribute/annotation system (`docs/grammar.ebnf`, `docs/spec/spec-draft.md` updated 2025-10-18).
+* ✅ Design docs for compile-time computation (CTC) & macros/metaclasses captured in `docs/spec/spec-draft.md` (sections "Compile-Time Computation" and "Compile-Time Computation & Metaprogramming").
 
 **M2 – Front‑End (Weeks 2–5)**
 
-* **Lexer** with trivia, source maps.
-* **Parser** (Pratt or GLR) generating **AST**.
-* **Symbol table** & **Name resolution**.
-* **Type checker** (generics, traits/interfaces, sum/product types, optional/null‑safety).
+* ✅ **Lexer** with trivia, source maps (`src/front/lexer.*`, `tests/front/test_lexer.cpp`).
+* ✅ **Parser** (Pratt) generating **AST** (`src/front/parser.*`, `tests/front/test_parser.cpp`).
+* **Symbol table** & **Name resolution** (symbol table scaffold in `src/sem/context.*`; full resolver pending).
+* **Type checker** (generics, traits/interfaces, sum/product types, optional/null-safety).
 
 **M3 – Middle IR (Weeks 4–6)**
 
-* SSA‑ish typed IR (IST‑IR) with effect annotations.
+* ✅ SSA-ish typed IR (IST-IR) module builder and text printer (`src/ir/*`, `tests/ir/test_ir.cpp`); effect annotations still TODO.
 * Lowering passes from AST → IR.
 
 **M4 – Optimizations (Weeks 6–8)**
 
-* Constant folding/prop, dead code elim, inlining heuristic, escape analysis (basic), purity‑aware CSE, loop‑simple opts.
+* ✅ Constant folding/prop pass with coverage (`src/opt/constant_folding.*`, `tests/ir/test_ir.cpp`).
+* Dead code elim, inlining heuristic, escape analysis (basic), purity-aware CSE, loop-simple opts.
 
 **M5 – Backends (Weeks 7–12)**
 
-* **C++17/20** generator (primary reference backend, high fidelity, exception model pluggable).
+* ✅ **C++17/20** generator (initial emitter for structs/functions/generics; extend for exceptions, advanced lowering).
 * **Java 21** generator.
 * **Python 3.12+** generator (typed hints optional).
 * **MATLAB** generator (function files + packages).
@@ -73,7 +76,8 @@
 
 **M7 – Tooling (Weeks 10–14)**
 
-* Formatter, linter, **LSP** (hover, go‑to, diagnostics), test runner, package manager (`istudio pm`).
+* ✅ **LSP** stdio scaffold (`src/lsp/*`, `tests/lsp/test_lsp.cpp`); hover/go-to/diagnostics wiring follows semantic analysis.
+* Formatter, linter, test runner, package manager (`istudio pm`).
 
 **M8 – Integration & Samples (Weeks 12–16)**
 
@@ -326,7 +330,7 @@ struct Point { x: f64, y: f64 }
 
 ## 14) LSP, Formatter, Linter
 
-* **LSP**: hover types, go‑to def, ref search, rename, code actions from diagnostics, semantic tokens.
+* **LSP**: ✅ transport scaffold (initialize/shutdown/exit via `src/lsp/server.cpp`); hover types, go-to def, ref search, rename, code actions, semantic tokens pending semantic data.
 * **Formatter**: stable style; operator spacing; import grouping.
 * **Linter**: idioms, perf hints, unsafe API usage, target portability.
 
@@ -493,12 +497,21 @@ OUTPUT FORMAT
 ## 22) Next Concrete Steps (Actionable)
 
 * ✅ Initialize repo with the skeleton from the **MASTER AI PROMPT** (completed 2024-10-17).
-* ✅ Implement tokens and a minimal lexer; add golden tests (completed 2024-10-17).
-* ✅ Write EBNF for core expressions/statements; parser for expressions first (completed 2024-10-17).
-* Stand up IR structs and printer; implement const folding.
-* Build the C++ backend emitter for functions + structs + generics (templates).
-* Add 3 example programs and their emitted C++/Java/Python to lock mapping.
-* Wire CI and LSP scaffold; publish the spec draft and ADRs.
+**Completed:**
+- ✅ Implement tokens and a minimal lexer; add golden tests (completed 2024-10-17).
+- ✅ Write EBNF for core expressions/statements; parser for expressions first (completed 2024-10-17).
+- ✅ Stand up IR structs and printer; implement const folding (completed 2024-10-17).
+- ✅ Build the C++ backend emitter for functions + structs + generics (templates) (completed 2025-10-17).
+- ✅ Add 3 example programs and their emitted C++/Java/Python to lock mapping (completed 2025-10-18).
+- ✅ Wire CI and LSP scaffold; publish the spec draft and ADRs (completed 2025-10-18).
+- ✅ Produce AST dumps (text/JSON) and begin semantic/type analysis scaffolding (symbol resolution, basic typing rules) (completed 2025-10-18).
+- ✅ Extend semantic analyzer with function signature tracking and richer expression typing to prime IR/type-checking work (completed 2025-10-18).
+
+**Upcoming:**
+- 🔜 Feed inferred types and function signatures into AST→IR lowering, with focused tests covering typed calls and return paths.
+- 🔜 Expand diagnostics to surface parameter/return mismatches using the recorded signature metadata.
+- 🔜 Implement type inference/unification across function bodies (generics, trait bounds) leveraging the new semantic scaffolding.
+- 🔜 Document the semantic analysis pipeline, data structures, and invariants in `docs/spec/` to guide contributors.
 
 ---
 

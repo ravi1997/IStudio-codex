@@ -20,8 +20,8 @@ bool is_digit(char ch) {
 }
 
 bool is_keyword(std::string_view word) {
-  constexpr std::array<std::string_view, 8> keywords{
-      "module", "fn",   "pub",   "let", "mut", "struct", "enum", "ct"};
+  constexpr std::array<std::string_view, 9> keywords{
+      "module", "fn",   "pub",   "let", "mut", "struct", "enum", "ct", "return"};
   for (auto kw : keywords) {
     if (kw == word) {
       return true;

@@ -14,6 +14,7 @@ using istudio::front::NodeId;
 using istudio::front::TokenKind;
 using istudio::front::lex;
 using istudio::front::parse_expression;
+using istudio::front::parse_module;
 
 namespace {
 
@@ -31,6 +32,12 @@ NodeId parse_expr(const std::string& source, AstContext& context) {
   LexerConfig config{};
   const auto tokens = lex(source, config);
   return parse_expression(tokens, context);
+}
+
+NodeId parse_mod(const std::string& source, AstContext& context) {
+  LexerConfig config{};
+  const auto tokens = lex(source, config);
+  return parse_module(tokens, context);
 }
 
 void test_assignment_and_precedence() {
@@ -105,6 +112,42 @@ void test_unary_expression() {
   expect(operand.kind == AstKind::IdentifierExpr, "operand should be identifier");
 }
 
+void test_let_and_return_statements() {
+  AstContext context{};
+  const NodeId module = parse_mod("let mut value = 1 + 2;\nreturn value;", context);
+  const auto& module_node = context.node(module);
+  expect(module_node.children.size() == 2, "module should contain two statements");
+
+  const auto& let_stmt = context.node(module_node.children[0]);
+  expect(let_stmt.kind == AstKind::LetStmt, "first statement should be let");
+  expect(let_stmt.value == "mut", "let statement should capture mutability");
+  expect(let_stmt.children.size() == 2, "let statement should have name and initializer");
+  const auto& name = context.node(let_stmt.children[0]);
+  expect(name.kind == AstKind::IdentifierExpr, "let name should be identifier");
+  expect(name.value == "value", "let name should be 'value'");
+
+  const auto& ret_stmt = context.node(module_node.children[1]);
+  expect(ret_stmt.kind == AstKind::ReturnStmt, "second statement should be return");
+  expect(ret_stmt.children.size() == 1, "return with value should have a child");
+}
+
+void test_block_statement_structure() {
+  AstContext context{};
+  const NodeId module = parse_mod("{ let x = 42; { return x; } }", context);
+  const auto& module_node = context.node(module);
+  expect(module_node.children.size() == 1, "module should contain a single block");
+
+  const auto& outer_block = context.node(module_node.children[0]);
+  expect(outer_block.kind == AstKind::BlockStmt, "outer node should be block statement");
+  expect(outer_block.children.size() == 2, "block should contain two child statements");
+
+  const auto& inner_block = context.node(outer_block.children[1]);
+  expect(inner_block.kind == AstKind::BlockStmt, "second child should be nested block");
+  expect(inner_block.children.size() == 1, "inner block should contain one statement");
+  const auto& nested_stmt = context.node(inner_block.children[0]);
+  expect(nested_stmt.kind == AstKind::ReturnStmt, "nested statement should be return");
+}
+
 }  // namespace
 
 void run_parser_tests() {
@@ -112,6 +155,7 @@ void run_parser_tests() {
   test_grouping_and_multiplication();
   test_call_expression();
   test_unary_expression();
+  test_let_and_return_statements();
+  test_block_statement_structure();
   std::cout << "All parser tests passed\n";
 }
-

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "ir/module.h"
 
@@ -12,11 +13,17 @@ struct TargetProfile {
   std::string version{};
 };
 
+struct GeneratedFile {
+  std::string path{};
+  std::string contents{};
+};
+
 class Backend {
  public:
   virtual ~Backend() = default;
   [[nodiscard]] virtual std::string name() const = 0;
-  virtual void emit(const ir::IRModule& module, const TargetProfile& profile) = 0;
+  [[nodiscard]] virtual std::vector<GeneratedFile> emit(const ir::IRModule& module,
+                                                        const TargetProfile& profile) = 0;
 };
 
 using BackendPtr = std::unique_ptr<Backend>;

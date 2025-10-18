@@ -1,0 +1,6 @@
+$1 = (std::tuple_element<1, std::pair<istudio::sem::FunctionSignature*, bool> >::type &&) @0x7fffffffd0a0: 176
+A debugging session is active.
+
+	Inferior 1 [process 360976] will be killed.
+
+Quit anyway? (y or n) [answered Y; input not from terminal]

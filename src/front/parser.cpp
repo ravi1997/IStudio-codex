@@ -12,13 +12,103 @@ support::Span merge_span(support::Span lhs, support::Span rhs) {
   return {.start = std::min(lhs.start, rhs.start), .end = std::max(lhs.end, rhs.end)};
 }
 
+support::Span span_covering(const TokenStream& tokens) {
+  if (tokens.tokens.empty()) {
+    return {};
+  }
+  support::Span span = tokens.tokens.front().span;
+  span.end = tokens.tokens.back().span.end;
+  return span;
+}
+
 }  // namespace
 
 Parser::Parser(const TokenStream& tokens, AstContext& context)
     : tokens_(tokens), context_(context), index_(0) {}
 
+NodeId Parser::parse_module() {
+  auto& module_ref = context_.create_node(AstKind::Module, span_covering(tokens_));
+  const NodeId module_id = module_ref.id;
+
+  while (!at_end() && current().kind != TokenKind::EndOfFile) {
+    NodeId stmt = parse_statement();
+    context_.node(module_id).children.push_back(stmt);
+  }
+
+  return module_id;
+}
+
 NodeId Parser::parse_expression() {
   return parse_expression(1);
+}
+
+NodeId Parser::parse_statement() {
+  if (check_keyword("let")) {
+    return parse_let_statement();
+  }
+  if (check_keyword("return")) {
+    return parse_return_statement();
+  }
+  if (check_symbol("{")) {
+    return parse_block_statement();
+  }
+
+  NodeId expr = parse_expression();
+  const Token& semi = consume_symbol(";", "expected ';' after expression");
+  const auto& expr_node = context_.node(expr);
+  auto& stmt = context_.create_node(AstKind::ExpressionStmt, merge_span(expr_node.span, semi.span));
+  stmt.children.push_back(expr);
+  return stmt.id;
+}
+
+NodeId Parser::parse_block_statement() {
+  const Token& open = consume_symbol("{", "expected '{'");
+  auto& block_ref = context_.create_node(AstKind::BlockStmt, open.span);
+  const NodeId block_id = block_ref.id;
+
+  while (!at_end() && !check_symbol("}")) {
+    NodeId stmt = parse_statement();
+    context_.node(block_id).children.push_back(stmt);
+  }
+
+  const Token& close = consume_symbol("}", "expected '}' to close block");
+  auto& block = context_.node(block_id);
+  block.span = merge_span(open.span, close.span);
+  return block_id;
+}
+
+NodeId Parser::parse_let_statement() {
+  const Token& let_token = consume_keyword("let", "expected 'let'");
+  bool is_mutable = match_keyword("mut");
+
+  const Token& ident = consume_identifier("expected identifier after 'let'");
+  auto& name_node = context_.create_node(AstKind::IdentifierExpr, ident.span, ident.lexeme);
+
+  consume_symbol("=", "expected '=' in let binding");
+  NodeId initializer = parse_expression();
+  const Token& semi = consume_symbol(";", "expected ';' after let binding");
+
+  auto& let_node =
+      context_.create_node(AstKind::LetStmt, merge_span(let_token.span, semi.span), is_mutable ? "mut" : "let");
+  let_node.children.push_back(name_node.id);
+  let_node.children.push_back(initializer);
+  return let_node.id;
+}
+
+NodeId Parser::parse_return_statement() {
+  const Token& return_token = consume_keyword("return", "expected 'return'");
+  bool has_value = !check_symbol(";");
+  NodeId value{};
+  if (has_value) {
+    value = parse_expression();
+  }
+  const Token& semi = consume_symbol(";", "expected ';' after return");
+
+  auto& return_node = context_.create_node(AstKind::ReturnStmt, merge_span(return_token.span, semi.span));
+  if (has_value) {
+    return_node.children.push_back(value);
+  }
+  return return_node.id;
 }
 
 NodeId Parser::parse_expression(int min_precedence) {
@@ -146,6 +236,36 @@ NodeId Parser::parse_call_expression(NodeId callee, support::Span callee_span) {
   return current_callee;
 }
 
+bool Parser::match_keyword(std::string_view keyword) {
+  if (check_keyword(keyword)) {
+    advance();
+    return true;
+  }
+  return false;
+}
+
+bool Parser::check_keyword(std::string_view keyword) const {
+  if (at_end()) {
+    return false;
+  }
+  const Token& token = current();
+  return token.kind == TokenKind::Keyword && token.lexeme == keyword;
+}
+
+const Token& Parser::consume_keyword(std::string_view keyword, std::string_view message) {
+  if (!check_keyword(keyword)) {
+    throw std::runtime_error(std::string(message));
+  }
+  return advance();
+}
+
+const Token& Parser::consume_identifier(std::string_view message) {
+  if (at_end() || current().kind != TokenKind::Identifier) {
+    throw std::runtime_error(std::string(message));
+  }
+  return advance();
+}
+
 bool Parser::match_symbol(std::string_view symbol) {
   if (check_symbol(symbol)) {
     advance();
@@ -237,6 +357,11 @@ bool Parser::is_unary_prefix(const Token& token) const {
     return token.lexeme == "await";
   }
   return false;
+}
+
+NodeId parse_module(const TokenStream& tokens, AstContext& context) {
+  Parser parser(tokens, context);
+  return parser.parse_module();
 }
 
 NodeId parse_expression(const TokenStream& tokens, AstContext& context) {

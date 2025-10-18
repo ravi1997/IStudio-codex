@@ -1,0 +1,10 @@
+module StringFormatting;
+
+fn greet(name: string) -> string {
+  return "Hello, " + name;
+}
+
+fn decorated(name: string, punctuation: string) -> string {
+  let base = greet(name);
+  return base + punctuation;
+}

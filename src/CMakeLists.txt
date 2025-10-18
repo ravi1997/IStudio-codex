@@ -1,11 +1,19 @@
 set(ISTUDIO_CORE_SOURCES
+  backends/cpp/cpp_backend.cpp
   front/token.cpp
   front/lexer.cpp
   front/parser.cpp
   front/ast.cpp
+  front/ast_dump.cpp
   sem/context.cpp
+  sem/analyzer.cpp
   ir/module.cpp
+  ir/printer.cpp
+  ir/lowering.cpp
   opt/pass_manager.cpp
+  opt/constant_folding.cpp
+  lsp/message_io.cpp
+  lsp/server.cpp
   support/diagnostics.cpp
   support/version.cpp
   plugins/registry.cpp
